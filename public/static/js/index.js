@@ -106,7 +106,7 @@ const render = (data,colorScheme) => {
 
 
 
-d3.csv('orcamentoData.csv').then(data => {
+d3.csv('public/orcamentoData.csv').then(data => {
   data.forEach(d => {
       d['Empenhado'] = +d['Empenhado'].replaceAll(".","");
       d['Pago'] = +d['Pago'].replaceAll(".","");
@@ -139,6 +139,8 @@ d3.csv('orcamentoData.csv').then(data => {
       const dropdown = document.getElementById('chartSelector');
       const filterSelect = document.getElementById('filter');
       const filterFuncao = document.getElementById('Funcao');
+      const filterSubFuncao = document.getElementById('Subfuncao');
+
   
       // Populate the filter select options
       uniqueResultadoPrimario.forEach(value => {
@@ -154,6 +156,14 @@ d3.csv('orcamentoData.csv').then(data => {
         filterFuncao.add(optionFuncao);
         
       })
+
+      // Populate the funcao select options
+  		uniqueSubfuncao.forEach(value => {
+      	var optionFuncao = document.createElement("option");
+        optionFuncao.text = value;
+        filterFuncao.add(optionFuncao);
+        
+      })
   		
 
   
@@ -163,11 +173,12 @@ d3.csv('orcamentoData.csv').then(data => {
     svg.selectAll('*').remove();
 
     const selectedValue = dropdown.value;
+    console.log("selected value dropdown ", selectedValue);
     const selectedDespesaType = filterSelect.value;
+    console.log("selected value selectedDespesaType ", selectedDespesaType);
     const selectedFuncaoType = filterFuncao.value;
-    console.log(selectedFuncaoType);
+    console.log("selected value selectedFuncaoType ", selectedFuncaoType);
     const filteredDespesaData = data.filter((d) => d['Resultado Primário'] === selectedDespesaType ||  d['Funcao'] === selectedFuncaoType);
-    const filteredFuncaoData = data.filter((d) => d['Funcao'] === selectedFuncaoType);
     const groupedData = d3
       .nest()
       .key((d) =>  d.Ano)
@@ -176,6 +187,7 @@ d3.csv('orcamentoData.csv').then(data => {
       })
       .entries(filteredDespesaData);
     
+      console.log("grouped data ", groupedData)
     const colorScheme = colorSchemes[selectedValue];
     render(groupedData, colorScheme);
   };
@@ -183,4 +195,4 @@ d3.csv('orcamentoData.csv').then(data => {
   dropdown.addEventListener('change', updateChart);
   filterSelect.addEventListener('change', updateChart);
   filterFuncao.addEventListener('change', updateChart);
- 	updateChart(); // Initial chart renderi
+ 	updateChart(); // Initial chart render

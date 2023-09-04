@@ -99,8 +99,9 @@
 
   d3.csv('orcamentoData.csv').then(data => {
     data.forEach(d => {
-      //d['Empenhado'] = +d['Empenhado'].replaceAll(".","");
-      //  d['Pago'] = +d['Pago'].replaceAll(".","");
+      //Entender este problema do bundle.js
+      d['Empenhado'] = +d['Empenhado'].replaceAll(".","");
+      d['Pago'] = +d['Pago'].replaceAll(".","");
 
     });
     
@@ -130,6 +131,8 @@
         const dropdown = document.getElementById('chartSelector');
         const filterSelect = document.getElementById('filter');
         const filterFuncao = document.getElementById('Funcao');
+        const filterSubfuncao = document.getElementById('Subfuncao');
+
     
         // Populate the filter select options
         uniqueResultadoPrimario.forEach(value => {
@@ -145,6 +148,15 @@
           filterFuncao.add(optionFuncao);
           
         });
+
+
+        // Populate the funcao select options
+    		uniqueSubfuncao.forEach(value => {
+        	var optionSubFuncao = document.createElement("option");
+          optionSubFuncao.text = value;
+          filterSubfuncao.add(optionSubFuncao);
+          
+        });
     		
 
     
@@ -153,12 +165,16 @@
        // Clear the previous chart
       svg.selectAll('*').remove();
 
-      const selectedValue = dropdown.value;
-      const selectedDespesaType = filterSelect.value;
-      const selectedFuncaoType = filterFuncao.value;
-      console.log(selectedFuncaoType);
-      const filteredDespesaData = data.filter((d) => d['Resultado Primário'] === selectedDespesaType ||  d['Funcao'] === selectedFuncaoType);
-      const filteredFuncaoData = data.filter((d) => d['Funcao'] === selectedFuncaoType);
+    const selectedValue = dropdown.value;
+    console.log("selected value dropdown ", selectedValue);
+    const selectedDespesaType = filterSelect.value;
+    console.log("selected value selectedDespesaType ", selectedDespesaType);
+    const selectedFuncaoType = filterFuncao.value;
+    console.log("selected value selectedFuncaoType ", selectedFuncaoType);
+    const selectedSubfuncaotype = filterSubfuncao.value;
+    console.log("selected value selectedFuncaoType ", selectedSubfuncaotype);
+
+    const filteredDespesaData = data.filter((d) => d['Resultado Primário'] === selectedDespesaType ||  d['Função'] === selectedFuncaoType || d['Subfunção'] === selectedSubfuncaotype);
       const groupedData = d3
         .nest()
         .key((d) =>  d.Ano)
@@ -166,6 +182,8 @@
           return d3.sum(d, (g) => g[selectedValue]);
         })
         .entries(filteredDespesaData);
+
+        console.log("groupedData ", groupedData);
       
       const colorScheme = colorSchemes[selectedValue];
       render(groupedData, colorScheme);
@@ -174,12 +192,60 @@
     dropdown.addEventListener('change', updateChart);
     filterSelect.addEventListener('change', updateChart);
     filterFuncao.addEventListener('change', updateChart);
+    filterSubfuncao.addEventListener('change', updateChart);
    	updateChart(); // Initial chart rendering.
 
 
+// set the dimensions and margins of the graph
+const margin = {top: 50, right: 0, bottom: 70, left: 180},
+    width1 = 1260 - margin.left - margin.right,
+    height1 = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+const svg1 = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width1 + margin.left + margin.right)
+    .attr("height", height1 + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
 
-  });
+// X axis
+const x = d3.scaleBand()
+  .range([ 0, width ])
+  .domain(data.map(d => d.Ano))
+  .padding(0.2);
+svg1.append("g")
+  .attr("transform", `translate(0, ${height})`)
+  .call(d3.axisBottom(x))
+  .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)")
+    .style("text-anchor", "end");
+
+// Add Y axis
+const y = d3.scaleLinear()
+  .domain(data.map(d => d.Pago))
+  .range([ height, 0]);
+svg1.append("g")
+  .call(d3.axisLeft(y));
+
+// Bars
+svg1.selectAll("mybar")
+  .data(data)
+  .enter().append("rect")
+    .attr("x", d => x(d.Ano))
+    .attr("y", d => y(d.Pago))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.Pago))
+    .attr("fill", "#69b3a2")
+
+  })
+
+
+
+
+
+
 
 }(d3));
 
