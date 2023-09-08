@@ -263,13 +263,14 @@ function showTooltip(event, d) {
   const tooltip = d3.select("#tooltip");
 
   tooltip
-    .html(`Year: ${d.Ano}<br>Empenhado: ${d.Empenhado}`)
+    .html(`Year: ${x(d.Ano)}<br>Empenhado: ${y(d.Empenhado)}`)
     .style("left", event.pageX + 10 + "px")
     .style("top", event.pageY - 10 + "px")
     .style("opacity", 0.9)
     .style("position", "absolute"); 
 
-  tooltip.node().classList.add("show");
+  tooltip.node().classList.add("show"); // Add a class to show the tooltip
+}
 
 // Function to hide the tooltip
 function hideTooltip() {
