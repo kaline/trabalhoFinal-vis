@@ -212,11 +212,11 @@ const svg1 = d3.select("#my_dataviz")
 
 // X axis
 const x = d3.scaleBand()
-  .range([ 0, width ])
+  .range([ 0, width1 ])
   .domain(data.map(d => d.Ano))
   .padding(0.2);
 svg1.append("g")
-  .attr("transform", `translate(0, ${height})`)
+  .attr("transform", `translate(0, ${height1})`)
   .call(d3.axisBottom(x))
   .selectAll("text")
     .attr("transform", "translate(-10,0)rotate(-45)")
@@ -224,8 +224,9 @@ svg1.append("g")
 
 // Add Y axis
 const y = d3.scaleLinear()
+//      .domain([0, d3$1.max(data, xValue)])
   .domain(data.map(d => d.Pago))
-  .range([ height, 0]);
+  .range([ height1, 0]);
 svg1.append("g")
   .call(d3.axisLeft(y));
 
@@ -236,7 +237,7 @@ svg1.selectAll("mybar")
     .attr("x", d => x(d.Ano))
     .attr("y", d => y(d.Pago))
     .attr("width", x.bandwidth())
-    .attr("height", d => height - y(d.Pago))
+    .attr("height", d => height1 - y(d.Pago))
     .attr("fill", "#69b3a2")
 
   })

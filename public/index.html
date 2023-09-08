@@ -7,50 +7,87 @@
   </head>
   <body>
 <nav>
-  <header>
-    <h1>Orçamento público</h1>
-    <nav>
-     
-    </nav>
-  </header>
-  <ul class="menu">
-		<li><a href="#">Home</a></li>
-		<li><a href="#">Sobre</a></li>
-	  		<li><a href="#">Informações</a>
-	         	<ul>
-	                  <li><a href="#">Orçamento</a></li>
-	                  <li><a href="#">Classificações</a></li>
-	                  <li><a href="#">Despesas</a></li>
-	       		</ul>
-			</li>
-		<li><a href="#">Links</a></li>
-		<li><a href="#">Contato</a></li>
- </ul>
   
-   <div>
-    <select id="chartSelector">
-         <option value="Empenhado">Empenhados</option>
-         <option value="Pago">Pagos</option>
-      </select>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Orçamento público</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              Despesas
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </div>
-      <div>
-        <select id="filter"></select>
-      </div>
- 		 <div>
-        <select id="Funcao">Função</select>
-      </div>
-      <div>
-        <select id="Subfuncao">SubFunção</select>
-      </div>
+  </nav>
+ 
    <div>
+
+
+
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="#">Action</a></li>
+    <li><a class="dropdown-item" href="#">Another action</a></li>
+    <li><a class="dropdown-item" href="#">Something else here</a></li>
+  </ul>
+</div>
+    
+<ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="#">Action</a></li>
+    <li><a class="dropdown-item" href="#">Another action</a></li>
+    <li><a class="dropdown-item" href="#">Something else here</a></li>
+  </ul>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <select id="chartSelector" class="form-control">
+          <option value="Empenhado">Empenhados</option>
+          <option value="Pago">Pagos</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="filter" class="form-control"></select>
+      </div>
+      <div class="col-md-3">
+        <select id="Funcao" class="form-control">Função</select>
+      </div>
+      <div class="col-md-3">
+        <select id="Subfuncao" class="form-control">SubFunção</select>
+      </div>
+    </div>
+  </div>
+.  
         <!--<label for="filter">Select Resultado Primário:</label>-->
          <!--<select id="Subfuncao">Subfunção</select></div>-->
 </div></nav>
     <!-- <a href="#" class="previous round">&#8249;</a>
     <a href="#" class="next round">&#8250;</a>   -->
-        <svg width="960" height="300"></svg>
-        <div id="my_dataviz"></div>
-        <!-- Create a div where the graph will take place -->
-      <div id="my_dataviz1"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <svg width="960" height="300"></svg>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div id="my_dataviz"></div>
+        </div>
+        <div class="col-md-6">
+          <div id="my_dataviz1"></div>
+        </div>
+      </div>
+    </div>
+    
   
 <script src="bundle.js"></script>
