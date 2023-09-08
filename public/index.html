@@ -73,6 +73,9 @@
 </div></nav>
     <!-- <a href="#" class="previous round">&#8249;</a>
     <a href="#" class="next round">&#8250;</a>   -->
+<!-- Tooltip element -->
+
+   
     <div class="container">
       <div class="row">
         <div class="col-md-12">
@@ -83,8 +86,22 @@
         <div class="col-md-6">
           <div id="my_dataviz"></div>
         </div>
+        </div>
+        </div>
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <select id="data-toggle" class="form-control">
+                <option value="Empenhado">Empenhados</option>
+                <option value="Pago">Pagos</option>
+              </select>
+            </div>
+        
         <div class="col-md-6">
-          <div id="my_dataviz1"></div>
+          <div id="my_dataviz1">
+            <div id="tooltip" style=""></div>
+          </div>
         </div>
       </div>
     </div>

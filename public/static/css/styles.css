@@ -60,6 +60,15 @@ body {
   cursor: pointer;
 }
 
+#data-toggle{
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  
+}
 /* Other styles for header, links, buttons, etc. */
 header {
   width: 100%;

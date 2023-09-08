@@ -13,7 +13,20 @@
     Empenhado: ['#1f77b4', '#aec7e8'],
     Pago: ['#ff7f0e', '#ffbb78'],
   };
+  
 
+  // set the dimensions and margins of the graph
+const margin = {top: 50, right: 0, bottom: 50, left: 180},
+width1 = 800 - margin.left - margin.right,
+height1 = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+const svg1 = d3.select("#my_dataviz1")
+.append("svg")
+.attr("width", width1 + margin.left + margin.right)
+.attr("height", height1 + margin.top + margin.bottom)
+.append("g")
+.attr("transform", `translate(${margin.left},${margin.top})`);
   const render = (data,colorScheme) => {
     
     const xValue = d => d.value;
@@ -76,11 +89,6 @@
     	 .attr('opacity', 0.8)
        .on('mouseenter', function (event, d) {
         	 d3$1.select(this).attr('opacity', 1);
-        //select(this).attr('opacity', 1);
-       // tooltip.text(xValue(d))  // Update the tooltip text with the xValue of the bar
-         // .attr("x", xScale(xValue(d)) + 5)  // Position the tooltip near the bar
-         // .attr("y", yScale(yValue(d)) + yScale.bandwidth() / 2)
-         // .style("opacity", 1);    
   		})
         .on('mouseleave', function () {
         d3$1.select(this).attr('opacity', 0.8);
@@ -196,19 +204,6 @@
    	updateChart(); // Initial chart rendering.
 
 
-// set the dimensions and margins of the graph
-const margin = {top: 50, right: 0, bottom: 70, left: 180},
-    width1 = 1260 - margin.left - margin.right,
-    height1 = 400 - margin.top - margin.bottom;
-
-// append the svg object to the body of the page
-const svg1 = d3.select("#my_dataviz")
-  .append("svg")
-    .attr("width", width1 + margin.left + margin.right)
-    .attr("height", height1 + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
-
 
 // X axis
 const x = d3.scaleBand()
@@ -222,26 +217,96 @@ svg1.append("g")
     .attr("transform", "translate(-10,0)rotate(-45)")
     .style("text-anchor", "end");
 
+    // Add Y axis with formatted labels
+var formatYAxis = d3.format(","); // Format with commas
 // Add Y axis
 const y = d3.scaleLinear()
 //      .domain([0, d3$1.max(data, xValue)])
-  .domain(data.map(d => d.Pago))
-  .range([ height1, 0]);
+.domain([0, d3.max(data, function(d) { return d.Empenhado; })])  
+.range([ height1, 0]);
 svg1.append("g")
-  .call(d3.axisLeft(y));
+  .call(d3.axisLeft(y).tickFormat(number =>
+    d3$1.format('.3s')(number)
+      .replace('G', 'B')));
 
 // Bars
 svg1.selectAll("mybar")
   .data(data)
   .enter().append("rect")
     .attr("x", d => x(d.Ano))
-    .attr("y", d => y(d.Pago))
+    .attr("y", function(d) { return y(d.Empenhado); })    
     .attr("width", x.bandwidth())
-    .attr("height", d => height1 - y(d.Pago))
+    .attr("height", function(d) { return height - y(d.Empenhado); })
     .attr("fill", "#69b3a2")
+    // Add hover interactions
+    .on("mouseover", function(event, d) {
+      // Add code here to handle mouseover event
+      // For example, you can change the color of the bar or display a tooltip.
+      d3.select(this).attr("fill", "red"); // Change the color to red on hover
+      showTooltip(event, d);
+    })
+    .on("mousemove", function(event, d) {
+      // Add code here to handle mousemove event
+      // For example, you can display a tooltip with information about the bar.
+      showTooltip(event, d);
+    })
+    .on("mouseout", function() {
+      // Add code here to handle mouseout event
+      // For example, you can revert the color of the bar or hide the tooltip.
+      d3.select(this).attr("fill", "#69b3a2"); // Revert the color on mouseout
+      hideTooltip();
+    });
 
-  })
+console.log(data);
 
+function showTooltip(event, d) {
+  const tooltip = d3.select("#tooltip");
+
+  tooltip
+    .html(`Year: ${d.Ano}<br>Empenhado: ${d.Empenhado}`)
+    .style("left", event.pageX + 10 + "px")
+    .style("top", event.pageY - 10 + "px")
+    .style("opacity", 0.9)
+    .style("position", "absolute"); 
+
+  tooltip.node().classList.add("show");
+
+// Function to hide the tooltip
+function hideTooltip() {
+  const tooltip = d3.select("#tooltip");
+  tooltip.style("opacity", 0);
+  tooltip.node().classList.remove("show"); // Remove the class to hide the tooltip
+}
+    
+
+
+ // Function to update the bars based on selected data
+function updateBars(selectedData) {
+  var yKey = selectedData === "Empenhado" ? "Empenhado" : "Pago";
+
+  svg1.selectAll("rect")
+      .data(data)
+      .transition()
+      .duration(500)
+      .attr("y", function(d) { return y(d[yKey]); })
+      .attr("height", function(d) { return height - y(d[yKey]); })
+      .attr("fill", function(d) {
+        return selectedData === "Empenhado" ? "#1f77b4" : "#ff7f0e";
+      })
+}
+
+// Initial rendering of bars with "Empenhado" data
+updateBars("Empenhado");
+
+// Add an event listener to the dropdown menu
+d3.select("#data-toggle").on("change", function() {
+  var selectedData = d3.select(this).property("value");
+  updateBars(selectedData);
+  console.log("selectedData ", selectedData)
+});
+
+
+})
 
 
 
