@@ -27,6 +27,8 @@ const svg1 = d3.select("#my_dataviz1")
 .attr("height", height1 + margin.top + margin.bottom)
 .append("g")
 .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
   const render = (data,colorScheme) => {
     
     const xValue = d => d.value;
@@ -256,15 +258,15 @@ svg1.selectAll("mybar")
       d3.select(this).attr("fill", "#69b3a2"); // Revert the color on mouseout
       hideTooltip();
     });
-
+  
 console.log(data);
 
-function showTooltip(event, d) {
+function showTooltip(d, event) {
   const tooltip = d3.select("#tooltip");
 
   tooltip
-    .html(`Year: ${x(d.Ano)}<br>Empenhado: ${y(d.Empenhado)}`)
-    .style("left", event.pageX + 10 + "px")
+  .html(`Year: ${d["Ano"]}<br>Empenhado: ${d["Empenhado"]}`)   
+   .style("left", event.pageX + 10 + "px")
     .style("top", event.pageY - 10 + "px")
     .style("opacity", 0.9)
     .style("position", "absolute"); 
@@ -311,7 +313,34 @@ d3.select("#data-toggle").on("change", function() {
 
 
 
+// Initial chart state
+let currentChart = 1;
 
+// Function to update the chart based on the current state
+function changeChart() {
+  const chartContainer = document.getElementById('chart-container');
+
+  // Clear the existing chart
+  chartContainer.innerHTML = '';
+
+  // Render the current chart based on the state
+  if (currentChart === 1) {
+    render();
+  } else if (currentChart === 2) {
+    render1();
+  }
+}
+
+// Add an event listener to the "Next" button
+const nextButton = document.getElementById('next-button');
+nextButton.addEventListener('click', () => {
+  // Toggle between Chart 1 and Chart 2
+  currentChart = currentChart === 1 ? 2 : 1;
+  changeChart();
+});
+
+// Initial rendering of the chart
+changeChart();
 
 
 }(d3));
