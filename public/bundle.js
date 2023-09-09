@@ -342,6 +342,90 @@ nextButton.addEventListener('click', () => {
 // Initial rendering of the chart
 changeChart();
 
+// Set the dimensions and margins of the graph
+var margin2 = { top: 10, right: 10, bottom: 10, left: 10 },
+  width2 = 445 - margin2.left - margin2.right,
+  height2 = 445 - margin2.top - margin2.bottom;
+
+// Append the SVG object to the body of the page
+var svg2 = d3
+  .select("#my_dataviz2")
+  .append("svg")
+  .attr("width", width2 + margin2.left + margin2.right)
+  .attr("height", height2 + margin2.top + margin2.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+// Read data
+d3.csv(
+  "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_hierarchy_1level.csv",
+  function (data) {
+    // Create a hierarchy based on the data
+    var root = d3
+      .stratify()
+      .id(function (d) {
+        return d.name;
+      })
+      .parentId(function (d) {
+        return d.parent || ""; // Use an empty string as the parent for the root node
+      })(data);
+
+    root.sum(function (d) {
+      return +d.value;
+    }); // Compute the numeric value for each entity
+
+    // Configure the treemap layout
+    var treemap = d3
+      .treemap()
+      .size([width2, height2])
+      .padding(4);
+
+    // Apply the treemap layout to the root hierarchy
+    treemap(root);
+
+    // Use this information to add rectangles:
+    svg2
+      .selectAll("rect")
+      .data(root.leaves())
+      .enter()
+      .append("rect")
+      .attr("x", function (d) {
+        return d.x0;
+      })
+      .attr("y", function (d) {
+        return d.y0;
+      })
+      .attr("width", function (d) {
+        return d.x1 - d.x0;
+      })
+      .attr("height", function (d) {
+        return d.y1 - d.y0;
+      })
+      .style("stroke", "black")
+      .style("fill", "#69b3a2");
+
+    // Add text labels
+    svg2
+      .selectAll("text")
+      .data(root.leaves())
+      .enter()
+      .append("text")
+      .attr("x", function (d) {
+        return d.x0 + 10;
+      })
+      .attr("y", function (d) {
+        return d.y0 + 20;
+      })
+      .text(function (d) {
+        return d.data.name;
+      })
+      .attr("font-size", "15px")
+      .attr("fill", "white");
+  }
+);
+
+
+
 
 }(d3));
 
