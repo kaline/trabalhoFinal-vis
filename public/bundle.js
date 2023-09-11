@@ -10,9 +10,12 @@
   const height = +svg.attr('height');
 
   const colorSchemes = {
-    Empenhado: ['#1f77b4', '#aec7e8'],
-    Pago: ['#ff7f0e', '#ffbb78'],
+    Empenhado: ['#0000FF', '#0000FF'], // Green
+    Pago: ['#FFD700', '#FFD700'], // Yellow
+    Liquidado: ['#008000', '#008000'],   // Blue
+    //White: ['#FFFFFF', '#FFFFFF']   // White
   };
+  
   
 
   // set the dimensions and margins of the graph
@@ -107,11 +110,12 @@ const svg1 = d3.select("#my_dataviz1")
 
 
 
-  d3.csv('orcamentoData.csv').then(data => {
+  d3.csv('orcamentoNew.csv').then(data => {
     data.forEach(d => {
       //Entender este problema do bundle.js
       d['Empenhado'] = +d['Empenhado'].replaceAll(".","");
       d['Pago'] = +d['Pago'].replaceAll(".","");
+      d['Liquidado'] = +d['Liquidado'].replaceAll(".", "");
 
     });
     
@@ -261,12 +265,36 @@ svg1.selectAll("mybar")
   
 console.log(data);
 
-function showTooltip(d, event) {
+function showTooltip(d,  selectedData, event) {
   const tooltip = d3.select("#tooltip");
+  let formattedValue;
+  
+  switch (selectedData) {
+    case "Empenhado":
+      formattedValue = parseFloat(d["Empenhado"]).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      break;
+    case "Pago":
+      formattedValue = parseFloat(d["Pago"]).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      break;
+    case "Liquidado":
+      formattedValue = parseFloat(d["Liquidado"]).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      break;
+    default:
+      formattedValue = "";
+  }
 
   tooltip
-  .html(`Year: ${d["Ano"]}<br>Empenhado: ${d["Empenhado"]}`)   
-   .style("left", event.pageX + 10 + "px")
+  .html(`Ano: ${d["Ano"]}<br>${selectedData}: R$ ${formattedValue}`)
+  .style("left", event.pageX + 10 + "px")
     .style("top", event.pageY - 10 + "px")
     .style("opacity", 0.9)
     .style("position", "absolute"); 
@@ -283,9 +311,28 @@ function hideTooltip() {
     
 
 
- // Function to update the bars based on selected data
+// Function to update the bars based on selected data
 function updateBars(selectedData) {
-  var yKey = selectedData === "Empenhado" ? "Empenhado" : "Pago";
+  var yKey;
+  var color;
+
+  switch (selectedData) {
+    case "Empenhado":
+      yKey = "Empenhado";
+      color = colorSchemes[selectedData][0]; // Use the first color for Empenhado
+      break;
+    case "Pago":
+      yKey = "Pago";
+      color = colorSchemes[selectedData][0]; // Use the first color for Pago
+      break;
+    case "Liquidado":
+      yKey = "Liquidado";
+      color = colorSchemes[selectedData][0]; // Use the first color for Liquidado
+      break;
+    default:
+      // Handle other cases or set a default behavior
+      break;
+  }
 
   svg1.selectAll("rect")
       .data(data)
@@ -293,10 +340,9 @@ function updateBars(selectedData) {
       .duration(500)
       .attr("y", function(d) { return y(d[yKey]); })
       .attr("height", function(d) { return height - y(d[yKey]); })
-      .attr("fill", function(d) {
-        return selectedData === "Empenhado" ? "#1f77b4" : "#ff7f0e";
-      })
+      .attr("fill", color);
 }
+
 
 // Initial rendering of bars with "Empenhado" data
 updateBars("Empenhado");
@@ -311,7 +357,7 @@ d3.select("#data-toggle").on("change", function() {
 
 })
 
-
+/* 
 
 // Initial chart state
 let currentChart = 1;
@@ -325,14 +371,14 @@ function changeChart() {
 
   // Render the current chart based on the state
   if (currentChart === 1) {
-    render();
+    //render();
   } else if (currentChart === 2) {
-    render1();
+    //render1();
   }
-}
+} */
 
 // Add an event listener to the "Next" button
-const nextButton = document.getElementById('next-button');
+/* const nextButton = document.getElementById('next-button');
 nextButton.addEventListener('click', () => {
   // Toggle between Chart 1 and Chart 2
   currentChart = currentChart === 1 ? 2 : 1;
@@ -341,7 +387,7 @@ nextButton.addEventListener('click', () => {
 
 // Initial rendering of the chart
 changeChart();
-
+ */
 // Set the dimensions and margins of the graph
 var margin2 = { top: 10, right: 10, bottom: 10, left: 10 },
   width2 = 445 - margin2.left - margin2.right,
@@ -355,74 +401,6 @@ var svg2 = d3
   .attr("height", height2 + margin2.top + margin2.bottom)
   .append("g")
   .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
-
-// Read data
-d3.csv(
-  "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_hierarchy_1level.csv",
-  function (data) {
-    // Create a hierarchy based on the data
-    var root = d3
-      .stratify()
-      .id(function (d) {
-        return d.name;
-      })
-      .parentId(function (d) {
-        return d.parent || ""; // Use an empty string as the parent for the root node
-      })(data);
-
-    root.sum(function (d) {
-      return +d.value;
-    }); // Compute the numeric value for each entity
-
-    // Configure the treemap layout
-    var treemap = d3
-      .treemap()
-      .size([width2, height2])
-      .padding(4);
-
-    // Apply the treemap layout to the root hierarchy
-    treemap(root);
-
-    // Use this information to add rectangles:
-    svg2
-      .selectAll("rect")
-      .data(root.leaves())
-      .enter()
-      .append("rect")
-      .attr("x", function (d) {
-        return d.x0;
-      })
-      .attr("y", function (d) {
-        return d.y0;
-      })
-      .attr("width", function (d) {
-        return d.x1 - d.x0;
-      })
-      .attr("height", function (d) {
-        return d.y1 - d.y0;
-      })
-      .style("stroke", "black")
-      .style("fill", "#69b3a2");
-
-    // Add text labels
-    svg2
-      .selectAll("text")
-      .data(root.leaves())
-      .enter()
-      .append("text")
-      .attr("x", function (d) {
-        return d.x0 + 10;
-      })
-      .attr("y", function (d) {
-        return d.y0 + 20;
-      })
-      .text(function (d) {
-        return d.data.name;
-      })
-      .attr("font-size", "15px")
-      .attr("fill", "white");
-  }
-);
 
 
 
