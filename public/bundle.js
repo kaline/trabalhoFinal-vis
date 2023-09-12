@@ -235,6 +235,14 @@ svg1.append("g")
     d3$1.format('.3s')(number)
       .replace('G', 'B')));
 
+      // Define selectedData with an initial value
+let selectedData = "Empenhado";
+
+// Add an event listener for changing the selected data (this could be a dropdown change event or any user interaction)
+document.getElementById("data-toggle").addEventListener("change", function () {
+  selectedData = this.value; // Update selectedData when the user changes the filter
+});
+
 // Bars
 svg1.selectAll("mybar")
   .data(data)
@@ -245,16 +253,19 @@ svg1.selectAll("mybar")
     .attr("height", function(d) { return height - y(d.Empenhado); })
     .attr("fill", "#69b3a2")
     // Add hover interactions
-    .on("mouseover", function(event, d) {
+    // Define selectedData at a scope where it's accessible to both event handlers
+
+
+    .on("mouseover", function(d, event) {
       // Add code here to handle mouseover event
       // For example, you can change the color of the bar or display a tooltip.
       d3.select(this).attr("fill", "red"); // Change the color to red on hover
-      showTooltip(event, d);
+      showTooltip(d, event, selectedData);
     })
-    .on("mousemove", function(event, d) {
+    .on("mousemove", function(d, event) {
       // Add code here to handle mousemove event
       // For example, you can display a tooltip with information about the bar.
-      showTooltip(event, d);
+      showTooltip(d, event, selectedData);
     })
     .on("mouseout", function() {
       // Add code here to handle mouseout event
@@ -264,33 +275,66 @@ svg1.selectAll("mybar")
     });
   
 console.log(data);
+// Define an object to map selectedData values to their corresponding legend labels
+var legendData = {
+  "Empenhado":{
+    label:"Empenhado",
+    color: colorSchemes["Empenhado"][0]
+  },
+  "Pago":{
+    label:"Pago",
+    color: colorSchemes["Pago"][0]
+  },
+  "Liquidado":{
+    label:"Liquidado",
+    color: colorSchemes["Liquidado"][0]
+  },
+ 
+};
 
-function showTooltip(d,  selectedData, event) {
+
+function showTooltip(d, event, selectedData) {  
   const tooltip = d3.select("#tooltip");
   let formattedValue;
-  
+
+  console.log("event ", event)
+  console.log("d ",d);
+  console.log("Selected Data:", selectedData); // Log the selectedData to the console
+  console.log("formattedValue ", formattedValue)
+  console.log("Empenhado Type:", typeof d["Empenhado"]);
+  console.log("Empenhado Value:", d["Empenhado"]);
   switch (selectedData) {
     case "Empenhado":
-      formattedValue = parseFloat(d["Empenhado"]).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
+      // Check if d["Empenhado"] is a valid numeric value before formatting
+      if (!isNaN(parseFloat(d["Empenhado"]))) {
+        formattedValue = parseFloat(d["Empenhado"]).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
       break;
     case "Pago":
-      formattedValue = parseFloat(d["Pago"]).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
+      // Similar check for "Pago" data
+      if (!isNaN(parseFloat(d["Pago"]))) {
+        formattedValue = parseFloat(d["Pago"]).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
       break;
     case "Liquidado":
-      formattedValue = parseFloat(d["Liquidado"]).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
+      // Similar check for "Liquidado" data
+      if (!isNaN(parseFloat(d["Liquidado"]))) {
+        formattedValue = parseFloat(d["Liquidado"]).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
       break;
     default:
       formattedValue = "";
   }
+
 
   tooltip
   .html(`Ano: ${d["Ano"]}<br>${selectedData}: R$ ${formattedValue}`)
@@ -316,6 +360,15 @@ function updateBars(selectedData) {
   var yKey;
   var color;
 
+    // Get the legend data for the selectedData from the legendData object
+  var legendDataItem = legendData[selectedData];
+
+  if (legendDataItem) {
+    yKey = selectedData;
+    color = legendDataItem.color; // Use the color from legendData
+  } else {
+    // Handle other cases or set a default behavior
+  }
   switch (selectedData) {
     case "Empenhado":
       yKey = "Empenhado";
@@ -341,11 +394,46 @@ function updateBars(selectedData) {
       .attr("y", function(d) { return y(d[yKey]); })
       .attr("height", function(d) { return height - y(d[yKey]); })
       .attr("fill", color);
+
+   // Update the legend with the selectedData label and color
+   updateLegend(legendDataItem);
 }
 
+// Function to update the legend element with the selectedData label and color
+function updateLegend(legendDataItem) {
+  // Assuming you have an HTML element with the id "legend" to display the legend
+  var legendElement = document.getElementById("legend");
 
+  if (legendDataItem) {
+    // Update the legend text with the selectedData label
+    legendElement.textContent = legendDataItem.label;
+
+    // Set the color of the legend text
+    legendElement.style.color = legendDataItem.color;
+  } else {
+    // Handle other cases or set a default behavior
+    legendElement.textContent = ""; // Clear the legend text
+    legendElement.style.color = ""; // Reset the color to its default state
+  }
+}
 // Initial rendering of bars with "Empenhado" data
 updateBars("Empenhado");
+
+ // Function to update the color square based on the selected data
+ function updateColorSquare() {
+  const selectedData = document.getElementById("data-toggle").value;
+  const colorSquare = document.getElementById("colorSquare");
+
+  // Get the color for the selectedData from the colorSchemes object
+  const color = colorSchemes[selectedData] ? colorSchemes[selectedData][0] : '';
+
+  // Update the background color of the square
+  colorSquare.style.backgroundColor = color;
+}
+ // Add an event listener to the select element to update the color square
+ document.getElementById("data-toggle").addEventListener("change", updateColorSquare);
+// Initialize the color square with the default selectedData
+updateColorSquare();
 
 // Add an event listener to the dropdown menu
 d3.select("#data-toggle").on("change", function() {
@@ -403,7 +491,141 @@ var svg2 = d3
   .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 
+     // Define color scale for values
+     const colorScale = d3.scaleOrdinal()
+     .domain(["Empenhado3", "Liquidado3", "Pago3"])
+     .range(["#1f77b4", "#ff7f0e", "#2ca02c"]); // Define colors for each value
 
+ // Define chart dimensions
+ const margin3 = {top: 100, right: 40, bottom: 50, left: 180},
+ width3 = 1200 - margin3.left - margin3.right,
+ height3 = 600 - margin3.top - margin3.bottom;
+
+ // Create SVG canvas
+ const svg3 = d3.select("#my_dataviz3")
+     .append("svg")
+     .attr("width", width3)
+     .attr("height", height3);
+
+ // Load data from CSV file
+ d3.csv("orcamentoNew.csv").then(function (data) {
+
+  const maxValue = d3.max(data, d => Math.max(d.Empenhado, d.Liquidado, d.Pago));
+     // Parse data types as needed
+     data.forEach(function (d) {
+         d.Empenhado = +d.Empenhado;
+         d.Liquidado = +d.Liquidado;
+         d.Pago = +d.Pago;
+     });
+
+     // Define scales
+     const xScale3 = d3.scaleBand()
+         .domain(data.map(d => d.Ano))
+         .range([margin3.left, width3 - margin3.right])
+         .padding(0.1);
+
+     const yScale3 = d3.scaleLinear()
+         .domain([0, maxValue])
+         .range([height3 - margin3.bottom, margin3.top]);
+
+     // Create and append bars for Empenhado
+     svg3.selectAll(".empenhado-bar3")
+         .data(data)
+         .enter()
+         .append("rect")
+         .attr("class", "empenhado-bar3")
+         .attr("x", d => xScale3(d.Ano))
+         .attr("y", d => yScale3(d.Empenhado3))
+         .attr("width", xScale3.bandwidth())
+         .attr("height", d => yScale3(0) - yScale3(d.Empenhado))
+         .attr("fill", colorScale("Empenhado3")); // Assign color for Empenhado
+
+     // Create and append bars for Liquidado
+     svg3.selectAll(".liquidado-bar3")
+         .data(data)
+         .enter()
+         .append("rect")
+         .attr("class", "liquidado-bar3")
+         .attr("x", d => xScale3(d.Ano))
+         .attr("y", d => yScale3(d.Liquidado))
+         .attr("width", xScale3.bandwidth())
+         .attr("height", d => yScale3(0) - yScale3(d.Liquidado))
+         .attr("fill", colorScale("Liquidado3")); // Assign color for Liquidado
+
+     // Create and append bars for Pago
+     svg3.selectAll(".pago-bar3")
+         .data(data)
+         .enter()
+         .append("rect")
+         .attr("class", "pago-bar3")
+         .attr("x", d => xScale3(d.Ano))
+         .attr("y", d => yScale3(d.Pago))
+         .attr("width", xScale3.bandwidth())
+         .attr("height", d => yScale3(0) - yScale3(d.Pago))
+         .attr("fill", colorScale("Pago3")); // Assign color for Pago
+
+     // Create x-axis
+     svg3.append("g")
+         .attr("transform", `translate(0,${height3 - margin3.bottom})`)
+         .call(d3.axisBottom(xScale3))
+         .selectAll("text")
+         .style("text-anchor", "middle");
+
+         // Create y-axis with automatically formatted labels
+         svg3.append("g")
+         .attr("transform", `translate(${margin3.left},0)`)
+         .call(d3.axisLeft(yScale3).ticks(5).tickFormat(d3.format(".2s")));
+         
+     
+ });
+
+ // Set the dimensions of the treemap container
+ const width4 = 800;
+ const height4 = 400;
+
+ // Select the treemap container
+ const treemapContainer = d3.select("#treemap");
+
+ // Load the CSV data
+ d3.csv("orcamentoNew.csv").then(data => {
+   // Create a hierarchical structure from the data
+   const root = d3.stratify()
+     .id(d => d.Função)
+     .parentId(d => d.Pago)
+     (data);
+
+   // Create a treemap layout
+   const treemap = d3.treemap()
+     .size([width4, height4]);
+
+   // Apply the layout to the hierarchical data
+   treemap(root);
+
+   // Create color scale (you can customize the colors)
+   const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+   // Create an SVG for the treemap
+   const svg4 = treemapContainer.append("svg")
+     .attr("width", width4)
+     .attr("height", height4);
+
+   // Create groups for each node and add rectangles
+   const cell = svg4.selectAll("g")
+     .data(root.descendants())
+     .enter().append("g")
+     .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+   cell.append("rect")
+     .attr("width", d => d.x1 - d.x0)
+     .attr("height", d => d.y1 - d.y0)
+     .attr("fill", d => color(d.depth));
+
+   // Add text labels
+   cell.append("text")
+     .attr("x", 3)
+     .attr("y", 13)
+     .text(d => d.data.Subcategory);
+ });
 
 }(d3));
 

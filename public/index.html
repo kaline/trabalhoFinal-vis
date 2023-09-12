@@ -96,7 +96,7 @@
         <div class="container">
           <div class="row">
             <div class="col-md-12">
-              <select id="data-toggle" class="form-control">
+              <select id="data-toggle" class="form-control" onchange="updateColorSquare()">
                 <option value="Empenhado">Empenhados</option>
                 <option value="Pago">Pagos</option>
                 <option value="Liquidado">Liquidado</option>
@@ -114,7 +114,22 @@
       </div>
     </div>
 
-    <div id="my_dataviz2"></div>
+    <div id="my_dataviz2">
+
+      <div class="container mt-4">
+        <div class="border p-3">
+            <h5 id="legend" class="font-weight-bold mb-3 text-primary"></h5>
+            <!-- Your content here -->
+            <div class="color-square" id="colorSquare"></div>
+            <p></p>
+        </div>
+    </div>
+    </div>
+
+    <div id="my_dataviz3"></div>
+    <div id="treemap"></div>
+
+    
     
   
 <script src="bundle.js"></script>

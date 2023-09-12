@@ -115,3 +115,9 @@ a:hover {
 .round {
   border-radius: 50%;
 }
+ /* CSS for the colored square */
+ .color-square {
+  width: 100px;
+  height: 100px;
+  background-color: #0000FF; /* Set the color for Empenhado */
+}
