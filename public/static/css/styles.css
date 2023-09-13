@@ -121,3 +121,18 @@ a:hover {
   height: 100px;
   background-color: #0000FF; /* Set the color for Empenhado */
 }
+
+
+#my_dataviz3{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
+ }
+
+ #treemap{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
