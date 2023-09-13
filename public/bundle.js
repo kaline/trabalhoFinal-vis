@@ -579,53 +579,271 @@ var svg2 = d3
      
  });
 
- // Set the dimensions of the treemap container
- const width4 = 800;
- const height4 = 400;
+ 
+/* // Define the dimensions of the treemap container
+const width4 = 800;
+const height4 = 600;
 
- // Select the treemap container
- const treemapContainer = d3.select("#treemap");
+// Select the container div
+const svg4 = d3.select('#treemap')
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height);
 
- // Load the CSV data
- d3.csv("orcamentoNew.csv").then(data => {
-   // Create a hierarchical structure from the data
-   const root = d3.stratify()
-     .id(d => d.Função)
-     .parentId(d => d.Pago)
-     (data);
+// Load the CSV data
+d3.csv('treemapData.csv').then(data => {
+  console.log("data ", data);
+    // Process the data (convert string numbers to integers)
+    data = data.filter(d => d.Ano !== "Total");
 
-   // Create a treemap layout
-   const treemap = d3.treemap()
-     .size([width4, height4]);
+    data.forEach(d => {
+      d['Empenhado'] = +d['Empenhado'].replaceAll(".","");
+      d['Pago'] = +d['Pago'].replaceAll(".","");
+      d['Liquidado'] = +d['Liquidado'].replaceAll(".", "");
+    });
+ 
+    console.log("data data ", data)
+    // Create a hierarchical structure for the data
+    const root = d3.stratify()
+        .id(d => d.Função)
+        .parentId(d => d.Ano === 'Total' ? null : 'Total') // Use 'Total' as the parent for non-'Total' rows        (data);
 
-   // Apply the layout to the hierarchical data
-   treemap(root);
+        console.log("root ", root)
+    // Create a treemap layout
+    const treemap = d3.treemap()
+        .size([width4, height4])
+        .padding(1);
 
-   // Create color scale (you can customize the colors)
-   const color = d3.scaleOrdinal(d3.schemeCategory10);
+    // Assign the hierarchy to the treemap layout
+    d3.treemap(root);
 
-   // Create an SVG for the treemap
-   const svg4 = treemapContainer.append("svg")
-     .attr("width", width4)
-     .attr("height", height4);
+    // Create rectangles for each data node
+    const cell = svg4
+        .selectAll('g')
+        .data(root.descendants()) // Use .descendants() to access descendants
+        .enter()
+        .append('g')
+        .attr('transform', d => `translate(${d.x0},${d.y0})`);
 
-   // Create groups for each node and add rectangles
-   const cell = svg4.selectAll("g")
-     .data(root.descendants())
-     .enter().append("g")
-     .attr("transform", d => `translate(${d.x0},${d.y0})`);
+    cell.append('rect')
+        .attr('width', d => d.x1 - d.x0)
+        .attr('height', d => d.y1 - d.y0)
+        .attr('fill', 'steelblue') // You can change the color as needed
 
-   cell.append("rect")
-     .attr("width", d => d.x1 - d.x0)
-     .attr("height", d => d.y1 - d.y0)
-     .attr("fill", d => color(d.depth));
+    // Add text labels to the rectangles
+    cell.append('text')
+        .attr('x', 3)
+        .attr('y', 12)
+        .attr('dy', '.35em')
+        .text(d => d.Função);
 
-   // Add text labels
-   cell.append("text")
-     .attr("x", 3)
-     .attr("y", 13)
-     .text(d => d.data.Subcategory);
- });
+})
+ */
+
+/* // set the dimensions and margins of the graph
+var margin4 = {top: 10, right: 10, bottom: 10, left: 10},
+  width4 = 445 - margin4.left - margin4.right,
+  height4 = 445 - margin4.top - margin4.bottom;
+
+// append the svg object to the body of the page
+var svg4 = d3.select("#treemap")
+.append("svg")
+  .attr("width", width4 + margin4.left + margin4.right)
+  .attr("height", height4 + margin4.top + margin4.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin4.left + "," + margin4.top + ")");
+
+// Read data
+d3.csv('treemapData.csv')  
+ .then((data) => {
+
+
+
+  data.forEach(d => {
+    d['Empenhado'] = +d['Empenhado'].replaceAll(".","");
+    d['Liquidado'] = +d['Liquidado'].replaceAll(".", "");
+  });
+  // stratify the data: reformatting for d3.js
+  var root = d3.stratify()
+    .id(function(d) { return d.Função; })   // Name of the entity (column name is name in csv)
+    .parentId(function(d) { return d.Ano; })   
+    (data);
+  root.sum(function(d) { return +d.Liquidado; })   // Compute the numeric value for each entity
+
+  // Then d3.treemap computes the position of each element of the hierarchy
+  // The coordinates are added to the root object above
+  d3.treemap()
+    .size([width4, height4])
+    .padding(4)
+    (root)
+
+console.log(root.leaves())
+  // use this information to add rectangles:
+  svg4
+    .selectAll("rect")
+    .data(root.leaves())
+    .enter()
+    .append("rect")
+      .attr('x', function (d) { return d.x0; })
+      .attr('y', function (d) { return d.y0; })
+      .attr('width', function (d) { return d.x1 - d.x0; })
+      .attr('height', function (d) { return d.y1 - d.y0; })
+      .style("stroke", "black")
+      .style("fill", "#69b3a2");
+
+  // and to add the text labels
+  svg4
+    .selectAll("text")
+    .data(root.leaves())
+    .enter()
+    .append("text")
+      .attr("x", function(d){ return d.x0+10})    // +10 to adjust position (more right)
+      .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
+      .text(function(d){ return d.data.Função})
+      .attr("font-size", "15px")
+      .attr("fill", "white")
+}) */
+
+// ...
+var margin4 = {top: 10, right: 0, bottom: 10, left: 250},
+  width4 = 945 - margin4.left - margin4.right,
+  height4 = 945 - margin4.top - margin4.bottom;
+
+// append the svg object to the body of the page
+var svg4 = d3.select("#treemap")
+.append("svg")
+  .attr("width", width4 + margin4.left + margin4.right)
+  .attr("height", height4 + margin4.top + margin4.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin4.left + "," + margin4.top + ")");
+// Read data
+d3.csv('treemapData.csv')
+  .then((data) => {
+    // Convert numeric columns to numbers and remove dots
+    data.forEach(d => {
+      d['Empenhado'] = +d['Empenhado'].replaceAll(".", "");
+      d['Liquidado'] = +d['Liquidado'].replaceAll(".", "");
+      d['Ano'] = +d['Ano']; // Ensure Ano is treated as a number
+    });
+  // Filter out rows where Funcao is NaN and get unique Funcao values
+  //data = data.filter(d => !isNaN(d.Função) && typeof d.Função !== 'undefined');
+  // Filter data to include only rows with unique Funcao values
+
+  // Aggregate data by Função and Ano using d3.nest
+  var nestedData = d3.nest()
+  .key(function(d) { return d.Função; })
+  .key(function(d) { return d.Ano; })
+  .rollup(function(group) {
+    return {
+      Função: group[0].Função,
+      Ano: group[0].Ano,
+      LiquidadoTotal: d3.sum(group, function(d) { return d.Liquidado; })
+    };
+  })
+  .entries(data);
+
+// Flatten the nested data structure
+var aggregatedData = [];
+nestedData.forEach(function(funcao) {
+  funcao.values.forEach(function(ano) {
+    aggregatedData.push(ano.value);
+  });
+}); 
+
+ // Sort the aggregated data by LiquidadoTotal in descending order
+ aggregatedData.sort(function(a, b) {
+  return b.LiquidadoTotal - a.LiquidadoTotal;
+});
+
+// Limit the data to the first 10 values
+var top10Data = aggregatedData.slice(1, 10);
+
+
+    // Create a new root for the treemap
+    var root = d3.hierarchy({
+      values: top10Data
+    }, d => d.values)
+      .sum(d => d.LiquidadoTotal);
+
+    // Then d3.treemap computes the position of each element of the hierarchy
+    d3.treemap()
+      .size([width4, height4])
+      .padding(4)
+      (root);
+
+    // ...
+
+     // Define a function to zoom on treemap elements
+     function zoom(d) {
+      const [x0, y0, x1, y1] = [d.x0, d.y0, d.x1, d.y1];
+      svg4.transition().duration(750).call(
+        zoomTo([x0, y0, x1, y1])
+      );
+    }
+
+    // Create a zoom function to set the zoom transform
+    function zoomTo(v) {
+      const k = width4 / (v[2] - v[0]);
+      return d3.zoom().scaleTo(k).translateTo(-v[0], -v[1]);
+    }
+
+    // Create a zoom behavior for the SVG
+    const zoomBehavior = d3.zoom()
+      .scaleExtent([1, 8])
+      .on('zoom', (event) => {
+        svg4.attr('transform', event.transform);
+      });
+
+    // Apply zoom behavior to the SVG
+    svg4.call(zoomBehavior);
+
+    // ...
+
+    // Use this information to add rectangles:
+    const treemapRects = svg4
+      .selectAll("rect")
+      .data(root.leaves())
+      .enter()
+      .append("rect")
+      .attr('x', function (d) { return d.x0; })
+      .attr('y', function (d) { return d.y0; })
+      .attr('width', function (d) { return d.x1 - d.x0; })
+      .attr('height', function (d) { return d.y1 - d.y0; })
+      .style("stroke", "black")
+      .style("fill", "#69b3a2")
+      .on('mouseover', function (d) {
+        // Highlight the element on mouseover
+        d3.select(this).style('fill', 'orange');
+      })
+      .on('mouseout', function () {
+        // Restore the original fill color on mouseout
+        d3.select(this).style('fill', '#69b3a2');
+      })
+      .on('click', zoom); // Zoom in on click
+    // And to add the text labels
+    svg4
+      .selectAll("text")
+      .data(root.leaves())
+      .enter()
+      .append("text")
+      .attr("x", function(d){ return d.x0+10})    // +10 to adjust position (more right)
+      .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
+      .text(function(d){ return d.data.Função + ' (' + d.data.Ano + ')'; })
+      .attr("font-size", "15px")
+      .attr("fill", "white")
+      .on('mouseover', function (d) {
+        // Highlight the element on mouseover
+        treemapRects.filter(e => e === d).style('fill', 'orange');
+      })
+      .on('mouseout', function () {
+        // Restore the original fill color on mouseout
+        treemapRects.style('fill', '#69b3a2');
+      })
+      .on('click', zoom); // Zoom in on click
+  });
+
 
 }(d3));
 

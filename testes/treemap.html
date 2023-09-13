@@ -1,0 +1,17 @@
+<html>
+    <body>
+        <script>
+            document.addEventListener('DOMContentLoaded', () =>{
+                fetch("https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json")
+                .then(res =>res.json())
+                .then(res =>{
+                    drawTreeMap(res);
+                });
+            });
+            const drawTreeMap = (dataset) => {
+                const hierarchy = d3.hierarchy(dataset);
+                console.log(" hierarchy ", hierarchy);
+            }
+        </script>
+    </body>
+</html>
